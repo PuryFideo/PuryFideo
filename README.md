@@ -45,6 +45,19 @@ The service opens:
 - WebSocket plugin endpoint: `ws://localhost:8080`
 - Local control page: `http://localhost:8090`
 
+## Update
+
+If you already have PuryFideo cloned, pull the latest changes and rebuild:
+
+```powershell
+cd PuryFideo
+git pull
+npm install
+npm run build
+```
+
+`npm install` is only strictly needed when `package.json`/`package-lock.json` changed, but it's safe to run every time. Stop the running service (`Ctrl+C`) before rebuilding, then `npm start` again afterward.
+
 ## Register In PuryFI
 
 1. Open the PuryFI options page.
