@@ -15,7 +15,7 @@ This is implemented as a local Node.js service instead of a browser-only extensi
 - PuryFI 0.8.6.0 or newer
 - `ffmpeg.exe` and `ffprobe.exe`
 
-You can satisfy the ffmpeg requirement in either of these ways:
+`ffmpeg.exe`/`ffprobe.exe` are not included in this repository (binary size and licensing). Download a Windows build from [gyan.dev's ffmpeg builds](https://www.gyan.dev/ffmpeg/builds/) or [ffmpeg.org](https://ffmpeg.org/download.html), then satisfy the requirement in one of these ways:
 
 - Put `ffmpeg.exe` and `ffprobe.exe` in this project root.
 - Put them in `bin/` under this project.
@@ -25,6 +25,8 @@ You can satisfy the ffmpeg requirement in either of these ways:
 ## Install
 
 ```powershell
+git clone https://github.com/PuryFideo/PuryFideo.git
+cd PuryFideo
 npm install
 npm run build
 ```
