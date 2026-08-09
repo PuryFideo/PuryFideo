@@ -159,6 +159,7 @@ export class VideoJobManager {
 
       job.message = "Extracting source frames.";
       this.setStatus(`Extracting frames from ${path.basename(job.inputPath)}.`);
+      const frameSyncArgs = (await supportsFpsMode(ffmpegPath)) ? ["-fps_mode", "passthrough"] : ["-vsync", "0"];
       await runCommand(ffmpegPath, [
         "-hide_banner",
         "-loglevel",
@@ -166,8 +167,7 @@ export class VideoJobManager {
         "-y",
         "-i",
         job.inputPath,
-        "-vsync",
-        "0",
+        ...frameSyncArgs,
         path.join(framesDir, "frame-%08d.png"),
       ]);
 
@@ -323,6 +323,28 @@ async function resolveExecutable(
 
 function looksLikePath(value: string): boolean {
   return value.includes("\\") || value.includes("/") || value.endsWith(".exe");
+}
+
+const fpsModeSupportCache = new Map<string, boolean>();
+
+// Newer ffmpeg (5.1+) deprecated global -vsync in favor of per-stream -fps_mode; probe the
+// actual binary instead of guessing from a version string, since users may have either.
+async function supportsFpsMode(ffmpegPath: string): Promise<boolean> {
+  const cached = fpsModeSupportCache.get(ffmpegPath);
+  if (cached !== undefined) {
+    return cached;
+  }
+
+  let supported = false;
+  try {
+    const { stdout, stderr } = await runCommand(ffmpegPath, ["-hide_banner", "-h", "full"]);
+    supported = stdout.includes("-fps_mode") || stderr.includes("-fps_mode");
+  } catch {
+    supported = false;
+  }
+
+  fpsModeSupportCache.set(ffmpegPath, supported);
+  return supported;
 }
 
 async function probeFrameRate(ffprobePath: string, inputPath: string): Promise<number> {
