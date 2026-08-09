@@ -1,0 +1,20 @@
+{
+  "name": "puryfideo",
+  "version": "0.1.0",
+  "description": "Local WebSocket video-processing plugin for PuryFI.",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsx watch src/index.ts",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "@pury-fi/plugin-sdk": "^1.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.3.0",
+    "tsx": "^4.20.5",
+    "typescript": "^5.9.2"
+  }
+}
