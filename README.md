@@ -9,6 +9,10 @@ PuryFideo is a local WebSocket plugin for PuryFI that censors full videos by:
 
 This is implemented as a local Node.js service instead of a browser-only extension because the heavy work is file I/O and `ffmpeg` orchestration.
 
+<video src="https://github.com/PuryFideo/PuryFideo/raw/master/puryfideo.mp4" controls muted>
+  Your browser does not support the video tag. <a href="puryfideo.mp4">Download the demo video</a>.
+</video>
+
 ## Requirements
 
 - Node.js 20+
