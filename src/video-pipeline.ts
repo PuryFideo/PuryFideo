@@ -78,7 +78,12 @@ export class VideoJobManager {
   private createJob(request: JobRequest): InternalJob {
     const normalizedInput = path.resolve(request.inputPath.trim());
     const outputPath = request.outputPath?.trim() ? path.resolve(request.outputPath.trim()) : "";
-    const tempDir = request.tempDir?.trim() ? path.resolve(request.tempDir.trim()) : "";
+    // Never use a user-chosen folder directly as the working/cleanup target - always nest a
+    // dedicated subfolder under it so cleanup can't ever wipe out a folder the user actually cares about.
+    const requestedTempBase = request.tempDir?.trim() ? path.resolve(request.tempDir.trim()) : "";
+    const tempDir = requestedTempBase
+      ? buildTempPath(requestedTempBase, normalizedInput, this.getConfig().tempDirName)
+      : "";
 
     return {
       id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
@@ -131,7 +136,7 @@ export class VideoJobManager {
 
     const config = this.getConfig();
     const outputPath = job.outputPath || buildOutputPath(job.inputPath, config.outputSuffix);
-    const tempRoot = job.tempDir || buildTempPath(job.inputPath, config.tempDirName);
+    const tempRoot = job.tempDir || buildTempPath(path.dirname(job.inputPath), job.inputPath, config.tempDirName);
     const framesDir = path.join(tempRoot, "frames-src");
     const censoredFramesDir = path.join(tempRoot, "frames-censored");
     let cleanupTemp = config.cleanupTemp;
@@ -262,10 +267,10 @@ export function buildOutputPath(inputPath: string, outputSuffix: string): string
   return path.join(directory, `${baseName}${outputSuffix}${extension}`);
 }
 
-function buildTempPath(inputPath: string, tempDirName: string): string {
+function buildTempPath(baseDir: string, inputPath: string, tempDirName: string): string {
   const baseName = path.basename(inputPath, path.extname(inputPath));
   const stamp = new Date().toISOString().replaceAll(":", "-").replaceAll(".", "-");
-  return path.join(path.dirname(inputPath), tempDirName, `${baseName}-${stamp}`);
+  return path.join(baseDir, tempDirName, `${baseName}-${stamp}`);
 }
 
 async function ensureReadableFile(filePath: string): Promise<void> {
